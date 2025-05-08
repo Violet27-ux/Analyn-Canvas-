@@ -1,0 +1,51 @@
+//Simple color picker in JavaScript
+
+<center>
+   <form>
+     <input type="color" onchange="Show()" id="txt"></body>
+      <p id="demo"></p>
+      <button type="button" onclick="Load()"><big>Copy Color</big></button>
+   </form>
+</center>
+
+<script type="text/javascript">
+function Load(){
+var l = document.getElementById("txt").value;
+const Clipbord = navigator.clipboard.writeText(l)
+
+ if(Clipbord){
+  alert("Color Code Copied" + " " + l)
+ }
+
+}
+function Show(){
+ var x = document.getElementById("txt").value;
+ document.getElementById("demo").innerHTML = x;
+}
+
+</script>
+
+<style type="text/css">
+input{
+border: none;
+width: 100px;
+height:100px;
+border-radius: none;
+box-shadow: 0 0 20px rgba(0,0,0,0.5);
+margin: 50px;
+padding:4px;
+}
+button{
+
+width: 160px;
+height:36px;
+border: none;
+border-radius: 2rem;
+background: #FF53C6;
+color: #ffffff;
+box-shadow: 0 0 20px rgba(0,0,0,0.5);
+outline: none;
+
+}
+
+</style>
