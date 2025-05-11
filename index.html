@@ -1,51 +1,145 @@
-//Simple color picker in JavaScript
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Interactive Circle Canvas</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 0;
+      padding: 20px;
+      background-color: #869fc9be;
+    }
 
-<center>
-   <form>
-     <input type="color" onchange="Show()" id="txt"></body>
-      <p id="demo"></p>
-      <button type="button" onclick="Load()"><big>Copy Color</big></button>
-   </form>
-</center>
+    header {
+      margin: 30px;
+      background-color: #2bffea;
+      padding: 30px;
+       border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
 
-<script type="text/javascript">
-function Load(){
-var l = document.getElementById("txt").value;
-const Clipbord = navigator.clipboard.writeText(l)
+    canvas {
+      border: 2px solid #000;
+      display: block;
+      margin: 0 auto;
+      background-color: pink;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Interactive Circle Canvas</h1>
+    <p>
+      Complete Name: Ma. Analyn G. Cantor<br>
+      Sex: Female<br>
+      Address: Zone 5, Del Carmen, Lagonoy, Cam Sur <br>
+      Course, Year, and Section: BSIT 2B<br>
+      Name of School: Partido State University<br>
+      Semester and Academic Year: 2nd Semester, AY 2024–2025<br>
+      Subject Code and Title: IT305 – Event driven programming<br>
+      Name of Subject Instructor: Arjay F. Abio
+    </p>
+  </header>
 
- if(Clipbord){
-  alert("Color Code Copied" + " " + l)
- }
+  <main>
+    <canvas id="circleCanvas" width="600" height="400"></canvas>
+  </main>
 
-}
-function Show(){
- var x = document.getElementById("txt").value;
- document.getElementById("demo").innerHTML = x;
-}
+  <script>
+    const canvas = document.getElementById('circleCanvas');
+    const ctx = canvas.getContext('2d');
 
-</script>
+    let circles = [];
+    let selectedCircle = null;
+    let isDragging = false;
+    let offsetX = 0, offsetY = 0;
 
-<style type="text/css">
-input{
-border: none;
-width: 100px;
-height:100px;
-border-radius: none;
-box-shadow: 0 0 20px rgba(0,0,0,0.5);
-margin: 50px;
-padding:4px;
-}
-button{
+    // Get mouse position relative to canvas
+    function getMousePos(evt) {
+      const rect = canvas.getBoundingClientRect();
+      return {
+        x: evt.clientX - rect.left,
+        y: evt.clientY - rect.top
+      };
+    }
 
-width: 160px;
-height:36px;
-border: none;
-border-radius: 2rem;
-background: #FF53C6;
-color: #ffffff;
-box-shadow: 0 0 20px rgba(0,0,0,0.5);
-outline: none;
+    // Draw all circles
+    function drawCircles() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      circles.forEach(circle => {
+        ctx.beginPath();
+        ctx.arc(circle.x, circle.y, circle.radius, 0, Math.PI * 2);
+        ctx.fillStyle = circle === selectedCircle ? 'red' : 'blue';
+        ctx.fill();
+        ctx.closePath();
+      });
+    }
 
-}
+    // Check if point is inside a circle
+    function isInsideCircle(x, y, circle) {
+      return Math.hypot(x - circle.x, y - circle.y) <= circle.radius;
+    }
 
-</style>
+    // Mouse down - select or create a circle
+    canvas.addEventListener('mousedown', function(evt) {
+      const pos = getMousePos(evt);
+      selectedCircle = null;
+
+      for (let i = circles.length - 1; i >= 0; i--) {
+        if (isInsideCircle(pos.x, pos.y, circles[i])) {
+          selectedCircle = circles[i];
+          offsetX = pos.x - selectedCircle.x;
+          offsetY = pos.y - selectedCircle.y;
+          isDragging = true;
+          break;
+        }
+      }
+
+      if (!selectedCircle) {
+        circles.push({ x: pos.x, y: pos.y, radius: 20 });
+      }
+
+      drawCircles();
+    });
+
+    // Mouse move - drag circle
+    canvas.addEventListener('mousemove', function(evt) {
+      if (isDragging && selectedCircle) {
+        const pos = getMousePos(evt);
+        selectedCircle.x = pos.x - offsetX;
+        selectedCircle.y = pos.y - offsetY;
+        drawCircles();
+      }
+    });
+
+    // Mouse up - stop dragging
+    canvas.addEventListener('mouseup', function() {
+      isDragging = false;
+    });
+
+    // Delete key - remove selected circle
+    document.addEventListener('keydown', function(evt) {
+      if (evt.key === 'Delete' && selectedCircle) {
+        circles = circles.filter(circle => circle !== selectedCircle);
+        selectedCircle = null;
+        drawCircles();
+      }
+    });
+
+    // Mouse wheel - resize selected circle
+    canvas.addEventListener('wheel', function(evt) {
+      if (selectedCircle) {
+        evt.preventDefault();
+        if (evt.deltaY < 0) {
+          selectedCircle.radius += 2;
+        } else {
+          selectedCircle.radius = Math.max(5, selectedCircle.radius - 2);
+        }
+        drawCircles();
+      }
+    });
+  </script>
+</body>
+</html>
